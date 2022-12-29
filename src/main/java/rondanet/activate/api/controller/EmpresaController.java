@@ -29,6 +29,7 @@ import java.util.Arrays;
 import java.util.List;
 
 import static org.springframework.http.ResponseEntity.ok;
+import static org.springframework.http.ResponseEntity.badRequest;
 
 @RestController
 public class EmpresaController implements IEmpresaController {
@@ -141,8 +142,8 @@ public class EmpresaController implements IEmpresaController {
 		try {
 			logger.log(Level.INFO,
 					"El método crearProducto() de la url /" + rutEmpresa + "/producto/adicionar fue ejecutado.");
-
-			Producto nuevoProducto = this.empresaService.guardarProducto(rutEmpresa, "096192", producto);
+            String usuario = "Hernan Sagastume";
+			Producto nuevoProducto = this.empresaService.guardarProducto(usuario,rutEmpresa, "096192", producto);
 			logger.log(Level.INFO,
 					"El método crearProducto() de la url /" + rutEmpresa + "/producto/adicionar fue ejecutado.");
 			return ok(new Representacion<Producto>(HttpStatus.OK.value(), nuevoProducto));
@@ -156,7 +157,6 @@ public class EmpresaController implements IEmpresaController {
 		} catch (Exception ex) {
 			logger.log(Level.ERROR, "empresa controller @PostMapping(\"/" + rutEmpresa
 					+ "/producto/adicionar\") Error: " + ex.getMessage(), ExceptionUtils.getStackTrace(ex));
-
 			throw new WebApplicationException("Ocurrió un error inesperado, intente nuevamente - " + ex.getMessage(),
 					HttpStatus.INTERNAL_SERVER_ERROR.value());
 		}
@@ -164,12 +164,12 @@ public class EmpresaController implements IEmpresaController {
 
 
 	@Override
-	public ResponseEntity<Representacion> eliminarProducto(String rutEmpresa, String gtinProducto) {
+	public ResponseEntity<Representacion> actualizarProducto(String rutEmpresa, String gtinProducto) {
 		try {
 			logger.log(Level.INFO,
 					"El método crearProducto() de la url /" + rutEmpresa + "/producto/adicionar fue ejecutado.");
-
-			 this.empresaService.eliminarProducto(rutEmpresa, gtinProducto);
+			 String usuario = "Hernan Sagastume";
+			 this.empresaService.actualizarProducto(usuario,rutEmpresa, gtinProducto);
 			logger.log(Level.INFO,
 					"El método crearProducto() de la url /" + rutEmpresa + "/producto/adicionar fue ejecutado.");
 			return ok(new Representacion<String>(HttpStatus.OK.value(), "Operación Exitosa"));
@@ -219,8 +219,8 @@ public class EmpresaController implements IEmpresaController {
 		try {
 			logger.log(Level.INFO, "El método crearProducto() de la url /" + rutEmpresa + "/producto/" + gtin
 					+ "/empaque/adicionar  fue ejecutado.");
-
-			Empaque empaqueNuevo = this.empresaService.guardarEmpaqueDelProducto(rutEmpresa, gtin, empaque);
+			 String usuario = "Ariam Alvarez";
+			Empaque empaqueNuevo = this.empresaService.guardarEmpaqueDelProducto(usuario,rutEmpresa, gtin, empaque);
 			logger.log(Level.INFO, "El método crearProducto() de la url /" + rutEmpresa + "/producto/" + gtin
 					+ "/empaque/adicionar fue ejecutado.");
 			return ok(new Representacion<Empaque>(HttpStatus.OK.value(), empaqueNuevo));
@@ -246,8 +246,8 @@ public class EmpresaController implements IEmpresaController {
 		try {
 			logger.log(Level.INFO, "El método eliminarEmpaqueDelProducto() de la url /" + rutEmpresa + "/producto/" + gtin13
 					+ "/empaque/"+ gtin14+"/eliminar  fue ejecutado.");
-
-			this.empresaService.eliminarEmpaqueDelProducto(rutEmpresa, gtin13, gtin14);
+			 String usuario = "Hernan Sagastume";
+			this.empresaService.eliminarEmpaqueDelProducto(usuario,rutEmpresa, gtin13, gtin14);
 			logger.log(Level.INFO, "El método eliminarEmpaqueDelProducto() de la url /" + rutEmpresa + "/producto/" + gtin13
 					+ "/empaque/"+ gtin14 +"/eliminar fue ejecutado.");
 			return ok(new Representacion<String>(HttpStatus.OK.value(), "Operación Exitosa"));

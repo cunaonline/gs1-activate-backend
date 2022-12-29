@@ -40,6 +40,7 @@ import rondanet.activate.entidades.Empaque;
 import rondanet.activate.entidades.Empresa;
 import rondanet.activate.entidades.Marca;
 import rondanet.activate.entidades.Producto;
+import rondanet.activate.enums.EstadoProducto;
 import rondanet.activate.exeptions.EmpresaException;
 import rondanet.activate.exeptions.MarcaException;
 import rondanet.activate.exeptions.ProductoException;
@@ -82,7 +83,7 @@ public class EmpresaService implements IEmpresaService {
 		}
 		return mensaje;
 	}
-
+	
 	@Override
 	public Integer adicionarMarca(String rutEmpresa, Integer tipo, String valor)
 			throws ServiceException, MarcaException, EmpresaException {
@@ -94,8 +95,7 @@ public class EmpresaService implements IEmpresaService {
 				// Obtengo las marcas de la Empresa
 				Set<Marca> marcas = empresa.getMarcas();
 				// Filtro para buscar si ya existe el elemento.
-				List filtrado = marcas.stream().filter(m -> m.equals(valor)).collect(Collectors.toList());
-
+				List<Marca>  filtrado = marcas.stream().filter(m -> m.equals(valor)).collect(Collectors.toList());
 				if (filtrado.size() == 0) {
 					idMarca = obtenerMarcaMayorId(marcas);
 					Marca nuevaMarca = new Marca(++idMarca, valor);
@@ -111,9 +111,8 @@ public class EmpresaService implements IEmpresaService {
 				// Obtengo las marcas de la Empresa
 				Set<Marca> subMarcas = empresa.getSubMarcas();
 				// Filtro para buscar si ya existe el elemento.
-				List filtrado = subMarcas.stream().filter(m -> m.equals(valor)).collect(Collectors.toList());
+				List<Marca> filtrado = subMarcas.stream().filter(m -> m.equals(valor)).collect(Collectors.toList());
 				if (filtrado.size() == 0) {
-					System.out.println("No Encontre");
 					idMarca = obtenerMarcaMayorId(subMarcas);
 					Marca nuevaMarca = new Marca(++idMarca, valor);
 					subMarcas.add(nuevaMarca);
@@ -173,58 +172,67 @@ public class EmpresaService implements IEmpresaService {
 	}
 
 	@Override
-	public Producto guardarProducto(String rutEmpresa, String codigoEmpresa, Producto producto)
+	public Producto guardarProducto(String usuario,String rutEmpresa, String codigoEmpresa, Producto producto)
 			throws ServiceException, ProductoException, EmpresaException {
 		// Busco la empresa
-		Empresa empresa = empresaDAO.buscarEmpresa(rutEmpresa);
-		if (empresa != null) {
+		List<Producto> productos = empresaDAO.getProductosDeEmpresa(rutEmpresa);
+
+		
 			// Genero Gtin
-			String gtin = generarGtin13(codigoEmpresa, empresa.getProductos());
+			String gtin = generarGtin13(codigoEmpresa, productos);
 			producto.setGtin(gtin);
 			Instant original = Instant.now();
 			producto.setFechaCreacion(Date.from(original));
 			producto.setFechaEdicion(Date.from(original));
 			producto.setEmpaques(new HashSet<>());
-			empresa.getProductos().add(producto);
+			producto.setUsuario(usuario);
+	
 
-			// Guardar Actividad Sobre el Producto
+			// Crear Actividad Sobre el Producto
 			Actividad actividad = new Actividad(producto.getFechaCreacion(), producto.getGtin(),
 					getDescripcionDelProducto(producto), producto.getEstado(), producto.getUsuario());
 
-			empresa.getActividades().add(actividad);
+		
+			empresaDAO.guardarProducto(rutEmpresa , producto);
+			empresaDAO.guardarActividadDelProducto(rutEmpresa,actividad);
+			return  producto;
 
-			empresaDAO.guardarEmpresa(empresa);
-		} else {
-			throw new EmpresaException("No existe una Empresa para este identificador");
-		}
-
-		return producto;
+		 
 	}
 	@Override
-	public void eliminarProducto(String rutEmpresa, String gtin)
+	public void actualizarProducto(String usuario,String rutEmpresa, String gtin)
 			throws ServiceException, ProductoException, EmpresaException {
-		// Busco la empresa
-		Empresa empresa = empresaDAO.buscarEmpresa(rutEmpresa);
-		if (empresa != null) {
-			Optional<Producto> producto = empresa.getProductos().stream().filter(x -> x.getGtin().equals(gtin))
-					.findFirst();
-			if (producto.isPresent()) {
-				empresa.getProductos().remove(producto.get());
-				empresaDAO.guardarEmpresa(empresa);
+		// Busco producto en la empresa
+		
+		List<Producto> productos = empresaDAO.getProductoDeEmpresaByGtin(rutEmpresa , gtin);
+		
+			if (productos.size()>0) {
+				Producto productoAModificar =  productos.get(0);
+				productoAModificar.setEstado(EstadoProducto.Baja);
+				Instant original = Instant.now();
+				productoAModificar.setFechaEdicion(Date.from(original));
+				productoAModificar.setUsuario(usuario);
+
+				// Guardar Actividad Sobre el Producto
+				Actividad actividad = new Actividad(productoAModificar.getFechaCreacion(), productoAModificar.getGtin(),
+						getDescripcionDelProducto(productoAModificar), productoAModificar.getEstado(), productoAModificar.getUsuario());
+
+			
+				empresaDAO.actualizarProducto(rutEmpresa, productoAModificar);
+				empresaDAO.guardarActividadDelProducto(rutEmpresa,actividad);
+				
 			} else {
 				throw new ProductoException("No existe un Producto para este identificador");
 			}
-		} else {
-			throw new EmpresaException("No existe una Empresa para este identificador");
-		}
+		
 	}
 	@Override
-	public Empaque guardarEmpaqueDelProducto(String rutEmpresa, String idProducto, Empaque empaque)
+	public Empaque guardarEmpaqueDelProducto(String usuario, String rutEmpresa, String idProducto, Empaque empaque)
 			throws ServiceException, ProductoException, EmpresaException {
 		// Busco la empresa
 		Empresa empresa = empresaDAO.buscarEmpresa(rutEmpresa);
 		if (empresa != null) {
-			// Producto pro = empresaDAO.getProductoByEmpresa(rutEmpresa,idProducto);
+		//	Producto pro = empresaDAO.getProductoByEmpresa(rutEmpresa,idProducto);
 
 			Optional<Producto> producto = empresa.getProductos().stream().filter(x -> x.getGtin().equals(idProducto))
 					.findFirst();
@@ -253,7 +261,7 @@ public class EmpresaService implements IEmpresaService {
 		return empaque;
 	}
 	@Override
-	public void eliminarEmpaqueDelProducto(String rutEmpresa, String idProducto, String idEmpaque)
+	public void eliminarEmpaqueDelProducto(String usuario,String rutEmpresa, String idProducto, String idEmpaque)
 			throws ServiceException, ProductoException, EmpresaException {
 		// Busco la empresa
 		Empresa empresa = empresaDAO.buscarEmpresa(rutEmpresa);
@@ -262,7 +270,7 @@ public class EmpresaService implements IEmpresaService {
 					.findFirst();
 			if (producto.isPresent()) {
 				// Obtengo los Empaques
-				Optional<Empaque> empaque = producto.get().getEmpaques().stream().filter(x -> x.getGtin().equals(idProducto))
+				Optional<Empaque> empaque = producto.get().getEmpaques().stream().filter(x -> x.getGtin().equals(idEmpaque))
 						.findFirst();
 				if (empaque.isPresent()) {
 					producto.get().getEmpaques().remove(empaque.get());
@@ -292,7 +300,7 @@ public class EmpresaService implements IEmpresaService {
 		return id;
 	}
 
-	private String generarGtin13(String codigoEmpresa, Set<Producto> productos) throws ProductoException {
+	private String generarGtin13(String codigoEmpresa, List<Producto> productos) throws ProductoException {
 
 		String gtin = "";
 		String paisCodigoEmpresa = "773" + codigoEmpresa;

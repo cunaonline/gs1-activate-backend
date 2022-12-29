@@ -99,8 +99,8 @@ public interface IEmpresaController {
 			@ApiResponse(responseCode = "500", description = "Error en el servidor", content = @Content(schema = @Schema(implementation = WebApplicationException.class))),
 			@ApiResponse(responseCode = "503", description = "Servidor no disponible", content = @Content(schema = @Schema(implementation = WebApplicationException.class))) })
 
-	@PostMapping("/{rutEmpresa}/producto/{gtin}/eliminar")
-	ResponseEntity<Representacion> eliminarProducto(
+	@PostMapping("/{rutEmpresa}/producto/{gtin}/actualizar")
+	ResponseEntity<Representacion> actualizarProducto(
 			@Parameter(description = "Rut de la empresa a buscar") @PathVariable("rutEmpresa") String rutEmpresa,
 			@Parameter(description = "Identificador del Producto") @PathVariable("gtin") String gtin);
 
