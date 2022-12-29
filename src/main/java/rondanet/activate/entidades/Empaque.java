@@ -11,50 +11,49 @@ import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import common.rondanet.catalogo.core.utils.serializer.CustomDateTimeDeserializer;
 import common.rondanet.catalogo.core.utils.serializer.CustomDateTimeSerializer;
 import io.swagger.v3.oas.annotations.media.Schema;
+import rondanet.activate.enums.EstadoProducto;
 
 @Schema(description = "Información de Producto")
 public class Empaque {
 
-    @Schema(description = "Identificador del Empaque")
-    private String gtin;
+	@Schema(description = "Identificador del Empaque")
+	private String gtin;
 
-    @Schema(description = "Tipo de Empaque")
-    private String empaque;
-    
-    @Schema(description = "Cantidad de unidades en el empaque")
-    private String unidades;
-    
-    @Schema(hidden = true)
-    @DateTimeFormat(pattern = "yyyy-MM-dd HH:mm:ss")
-    protected Date fechaCreacion;
+	@Schema(description = "Tipo de Empaque")
+	private String empaque;
 
-    @Schema(hidden = true)
-    @DateTimeFormat(pattern = "yyyy-MM-dd HH:mm:ss")
-    protected Date fechaEdicion;
+	@Schema(description = "Cantidad de unidades en el empaque")
+	private String unidades;
 
+	@Schema(description = "Estado")
+	private EstadoProducto estado;
 
-    public Empaque() {
-        super();
-    }
+	@Schema(hidden = true)
+	@DateTimeFormat(pattern = "yyyy-MM-dd HH:mm:ss")
+	protected Date fechaCreacion;
 
+	@Schema(hidden = true)
+	@DateTimeFormat(pattern = "yyyy-MM-dd HH:mm:ss")
+	protected Date fechaEdicion;
 
+	public Empaque() {
+		super();
+	}
 
-	public Empaque(String gtin, String empaque, String unidades, Date fechaCreacion,
+	public Empaque(String gtin, String empaque, String unidades, EstadoProducto estado, Date fechaCreacion,
 			Date fechaEdicion) {
 		super();
 		this.gtin = gtin;
 		this.empaque = empaque;
 		this.unidades = unidades;
+		this.estado = estado;
 		this.fechaCreacion = fechaCreacion;
 		this.fechaEdicion = fechaEdicion;
 	}
 
-
-
 	public String getGtin() {
 		return gtin;
 	}
-
 
 	public void setGtin(String gtin) {
 		this.gtin = gtin;
@@ -76,6 +75,14 @@ public class Empaque {
 		this.unidades = unidades;
 	}
 
+	public EstadoProducto getEstado() {
+		return estado;
+	}
+
+	public void setEstado(EstadoProducto estado) {
+		this.estado = estado;
+	}
+
 	public Date getFechaCreacion() {
 		return fechaCreacion;
 	}
@@ -91,4 +98,5 @@ public class Empaque {
 	public void setFechaEdicion(Date fechaEdicion) {
 		this.fechaEdicion = fechaEdicion;
 	}
+
 }

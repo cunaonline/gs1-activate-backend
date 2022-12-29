@@ -3,14 +3,8 @@ package rondanet.activate.entidades;
 import java.util.Date;
 import java.util.Set;
 
-import org.joda.time.DateTime;
 import org.springframework.format.annotation.DateTimeFormat;
 
-import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
-import com.fasterxml.jackson.databind.annotation.JsonSerialize;
-
-import common.rondanet.catalogo.core.utils.serializer.CustomDateTimeDeserializer;
-import common.rondanet.catalogo.core.utils.serializer.CustomDateTimeSerializer;
 import io.swagger.v3.oas.annotations.media.Schema;
 import rondanet.activate.enums.EstadoProducto;
 

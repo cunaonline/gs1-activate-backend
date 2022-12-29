@@ -6,6 +6,8 @@ import java.util.Set;
 
 import org.joda.time.DateTime;
 import org.springframework.data.annotation.Id;
+import org.springframework.data.mongodb.core.index.CompoundIndex;
+import org.springframework.data.mongodb.core.index.CompoundIndexes;
 import org.springframework.data.mongodb.core.mapping.Document;
 import org.springframework.format.annotation.DateTimeFormat;
 
@@ -19,6 +21,9 @@ import io.swagger.v3.oas.annotations.media.Schema;
 
 @Schema(description = "Empresa Activate")
 @Document(collection = "Empresa")
+@CompoundIndexes({
+    @CompoundIndex(name = "empresa_rut_gtin", def = "{ 'rut': 1, 'productos.gtin' : 1 }", unique = true)
+})
 public class Empresa {
 
 	@Id
@@ -41,6 +46,7 @@ public class Empresa {
 
 	@Schema(description = "Identificador de la empresa. Es único para cada empresa.", required = true)
 	private String rut;
+	
 	@Schema(description = "Marcas creadas de productos.")
 	private Set<Marca> marcas = new HashSet<>();
 

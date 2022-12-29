@@ -56,18 +56,18 @@ public interface IEmpresaService {
 
 	List<Marca> eliminarMarca(String rutEmpresa, Integer tipo, Integer id) throws ServiceException, MarcaException, EmpresaException;
 
-	Producto guardarProducto(String rutEmpresa, String codigoEmpresa, Producto producto)
+	Producto guardarProducto(String usuario,String rutEmpresa, String codigoEmpresa, Producto producto)
 			throws ServiceException, ProductoException, EmpresaException;
 
-	void eliminarProducto(String rutEmpresa, String gtinProducto)
+	void actualizarProducto(String usuario,String rutEmpresa, String gtinProducto)
 			throws ServiceException, ProductoException, EmpresaException;
 
 	String guardarImagenDelProducto(String rutEmpresa, Integer gtin, MultipartFile file) throws ServiceException;
 
-	Empaque guardarEmpaqueDelProducto(String rutEmpresa, String codigoEmpresa, Empaque producto)
+	Empaque guardarEmpaqueDelProducto(String usuario,String rutEmpresa, String codigoEmpresa, Empaque producto)
 			throws ServiceException, ProductoException, EmpresaException;
 
-	void eliminarEmpaqueDelProducto(String rutEmpresa, String idProducto, String idEmpaque)
+	void eliminarEmpaqueDelProducto(String usuario,String rutEmpresa, String idProducto, String idEmpaque)
 			throws ServiceException, ProductoException, EmpresaException;
 
 }
